@@ -1,7 +1,12 @@
 <?php require_once('./database/connection.php'); ?>
 
 <?php
-$id = $_GET['id'];
+if(isset($_GET['id']) && !empty($_GET['id'])) {
+    $id = $_GET['id'];
+} else {
+    header('location: ./index.php');
+}
+
 $sql = "SELECT * FROM `users` WHERE `id` = $id";
 $result = $conn->query($sql);
 $user = $result->fetch_assoc();
@@ -10,6 +15,31 @@ $name = $user['name'];
 $email = $user['email'];
 
 $error = $success = '';
+
+if(isset($_POST['submit'])) {
+    $name = htmlspecialchars($_POST['name']);
+    $email = htmlspecialchars($_POST['email']);
+
+    if (empty($name)) {
+        $error = 'Please Provide your Name!';
+    } elseif (empty($email)) {
+        $error = 'Please Provide your Email!';
+    } else {
+        $sql = "SELECT * FROM `users` WHERE `email` = '$email' AND `id` != $id";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $error = "Email alreday exists!";
+        } else {
+            $sql = "UPDATE `users` SET `name` = '$name',`email` = '$email' WHERE `id` = $id";
+            if ($conn->query($sql)) {
+                $success = "Magic has been spelled";
+            } else {
+                $error = "Magic has failed to spell";
+            }
+        }
+    }
+}
 
 ?>
 
@@ -55,7 +85,7 @@ $error = $success = '';
                         }
                         ?>
 
-                        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+                        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?id=<?php echo $id; ?>" method="post">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
                                 <input type="text" name="name" id="name" class="form-control" value="<?php echo $name; ?>" placeholder="Enter your name!">
@@ -68,7 +98,6 @@ $error = $success = '';
 
                             <div>
                                 <input type="submit" class="btn btn-primary" name="submit">
-                                <input type="reset" class="btn btn-dark">
                             </div>
                         </form>
                     </div>

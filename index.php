@@ -63,15 +63,16 @@ $users = $result->fetch_all(MYSQLI_ASSOC);
                                     ?>
 
                                     <?php
+                                    $sr = 1;
                                     foreach ($users as $user) { ?>
                                         <tr>
-                                            <td>1</td>
+                                            <td><?php echo $sr++; ?></td>
                                             <td><?php echo $user['name']; ?></td>
                                             <td><?php echo $user['email']; ?></td>
                                             <td><?php echo $user['created_at']; ?></td>
                                             <td>
                                                 <a href="./edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-primary">Edit</a>
-                                                <a href="" class="btn btn-danger">Delete</a>
+                                                <a href="./delete_user.php?id=<?php echo $user['id']; ?>" class="btn btn-danger">Delete</a>
                                             </td>
                                         </tr>
                                     <?php
